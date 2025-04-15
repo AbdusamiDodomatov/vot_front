@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Результаты опроса{% endblock %}
+
+{% block content %}
+<h2>Результаты опроса: {{ poll.question }}</h2>
+
+<ul class="list-group">
+    {% for choice in poll.choices.all %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            {{ choice.text }}
+            <span class="badge bg-success rounded-pill">{{ choice.votes.count }}</span>
+        </li>
+    {% empty %}
+        <li class="list-group-item">Нет вариантов ответа</li>
+    {% endfor %}
+</ul>
+{% endblock %}

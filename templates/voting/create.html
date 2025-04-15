@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Создание опроса{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm">
+  <div class="card-header bg-primary text-white">
+    <h3 class="mb-0">Создание нового опроса</h3>
+  </div>
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      
+      <div class="mb-3">
+        <label for="question_text" class="form-label">Текст вопроса</label>
+        <input type="text" class="form-control" id="question_text" name="question_text" placeholder="Введите вопрос" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="choice1" class="form-label">Вариант 1</label>
+        <input type="text" class="form-control" id="choice1" name="choice1" required>
+      </div>
+      <div class="mb-3">
+        <label for="choice2" class="form-label">Вариант 2</label>
+        <input type="text" class="form-control" id="choice2" name="choice2" required>
+      </div>
+      <div class="mb-3">
+        <label for="choice3" class="form-label">Вариант 3 (необязательно)</label>
+        <input type="text" class="form-control" id="choice3" name="choice3">
+      </div>
+      <div class="mb-3">
+        <label for="choice4" class="form-label">Вариант 4 (необязательно)</label>
+        <input type="text" class="form-control" id="choice4" name="choice4">
+      </div>
+
+      <button type="submit" class="btn btn-success">Создать опрос</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
