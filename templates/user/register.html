@@ -1,10 +1,36 @@
 {% extends 'base.html' %}
-{% block title %}Регистрация{% endblock %}
+
+{% load custom_tags %}
+
 {% block content %}
-<h2>Регистрация</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-success">Зарегистрироваться</button>
-</form>
+  <div class="container">
+    <h2 class="my-4 text-center">Ro'yxatdan o'tish</h2>
+
+    <form method="post">
+      {% csrf_token %}
+      
+      {% for field in form %}
+        <div class="form-group mb-3">
+          <!-- Добавление класса к label -->
+          <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+          
+          <!-- Добавление класса к полю формы -->
+          {{ field|add_class:"form-control" }}
+          
+          {% if field.errors %}
+            <div class="text-danger">
+              {{ field.errors|striptags }}
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+      
+      <button type="submit" class="btn btn-primary btn-block">Ro'yxatdan o'tish</button>
+    </form>
+
+    <p class="text-center mt-3">
+      Hisob allaqachon mavjud? 
+      <a href="{% url 'login' %}">Kirish</a>
+    </p>
+  </div>
 {% endblock %}

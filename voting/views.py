@@ -1,67 +1,56 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Poll, Choice, PollVote
+from .models import Election, Choice, Vote
+from django.contrib import messages
+from django.utils import timezone
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count
-
-
-def index(request):
-    """Главная страница со списком опросов"""
-    polls = Poll.objects.all().order_by('-created_at')
-    return render(request, 'voting/index.html', {'polls': polls})
-
-
-def detail(request, pk):
-    """Страница одного опроса с вариантами выбора"""
-    poll = get_object_or_404(Poll, pk=pk)
-    choices = poll.choices.all()
-    return render(request, 'voting/detail.html', {'poll': poll, 'choices': choices})
-
 
 @login_required
-def vote(request, pk):
-    """Обработка голосования пользователя"""
-    poll = get_object_or_404(Poll, pk=pk)
+def vote_list(request):
+    elections = Election.objects.filter(start_date__lte=timezone.now(), end_date__gte=timezone.now())
+    user_votes = Vote.objects.filter(user=request.user)
+    voted_ids = [v.election_id for v in user_votes]
+    return render(request, 'voting/vote_list.html', {
+        'elections': elections,
+        'voted_ids': voted_ids,
+    })
 
-    if PollVote.objects.filter(poll=poll, user=request.user).exists():
-        return render(request, 'voting/already_voted.html', {'poll': poll})
+@login_required
+def vote_detail(request, election_id):
+    election = get_object_or_404(Election, pk=election_id)
+    if not election.is_active():
+        messages.error(request, 'Ovoz berish mumkin emas.')
+        return redirect('voting:vote_list')
 
-    try:
-        selected_choice_id = request.POST['choice']
-        selected_choice = poll.choices.get(pk=selected_choice_id)
-    except (KeyError, Choice.DoesNotExist):
-        return render(request, 'voting/detail.html', {
-            'poll': poll,
-            'choices': poll.choices.all(),
-            'error_message': "Вы не выбрали вариант.",
-        })
+    if Vote.objects.filter(user=request.user, election=election).exists():
+        messages.info(request, 'Siz allaqachon ovoz bergansiz.')
+        return redirect('voting:vote_list')
 
-    # Создаём голос
-    PollVote.objects.create(
-        poll=poll,
-        choice=selected_choice,
-        user=request.user
-    )
+    if request.method == 'POST':
+        choice_id = request.POST.get('choice')
+        choice = get_object_or_404(Choice, pk=choice_id, election=election)
 
-    return redirect('voting:results', pk=poll.pk)
+        # Засчитываем голос
+        Vote.objects.create(user=request.user, election=election, choice=choice)
+        choice.votes += 1
+        choice.save()
 
+        messages.success(request, 'Sizning ovozingiz qabul qilindi.')
+        return redirect('voting:vote_list')
 
-def results(request, pk):
-    """Страница с результатами голосования"""
-    poll = get_object_or_404(Poll, pk=pk)
-    
-    choices = poll.choices.annotate(
-        vote_count=Count('votes')
-    )
-
-    total_votes = PollVote.objects.filter(poll=poll).count()
-
-    return render(request, 'voting/results.html', {
-        'poll': poll,
-        'choices': choices,
-        'total_votes': total_votes
+    return render(request, 'voting/vote_detail.html', {
+        'election': election,
     })
 
 
 
-def create_poll(request):
-    return render(request, 'voting/create.html')
+def election_list(request):
+    elections = Election.objects.all()
+    user_votes = Vote.objects.filter(user=request.user)
+    voted_ids = user_votes.values_list('election_id', flat=True)
+    votes_dict = {vote.election_id: vote for vote in user_votes}
+
+    return render(request, 'voting/election_list.html', {
+        'elections': elections,
+        'voted_ids': voted_ids,
+        'votes_dict': votes_dict,  
+    })

@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Mavjud ovoz berish</h2>
+<div class="election-container">
+  {% for election in elections %}
+    <div class="election-item">
+      <strong>{{ election.title }}</strong>
+
+      {% if election.id in voted_ids %}
+        <p>✅ Siz ovoz berdingiz.</p>
+
+        {% with vote=votes_dict.election.id %}
+        <ul class="choices-list">
+          {% for choice in election.choices.all %}
+            <li class="choice-item {% if vote.choice.id == choice.id %}voted-choice{% endif %}">
+              {% if choice.photo %}
+                <img src="{{ choice.photo.url }}" alt="{{ choice.text }}" class="candidate-photo">
+              {% endif %}
+              <strong>
+                {% if vote.choice.id == choice.id %}✅ {% endif %}
+                {{ choice.text }}
+              </strong><br>
+              {{ choice.votes }} ovozlar
+              {% if vote.choice.id == choice.id %}
+                <span class="badge bg-success mt-1">Sizning tanlovingiz</span>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+        {% endwith %}
+
+      {% else %}
+        <a href="{% url 'voting:vote_detail' election.id %}" class="btn btn-primary mt-2">Ovoz berish</a>
+      {% endif %}
+    </div>
+  {% empty %}
+    <p>Faol ovoz berish yo'q.</p>
+  {% endfor %}
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+  .election-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .election-item {
+    background-color: #fafafa;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 30%;
+  }
+
+  .choices-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 10px;
+    padding-left: 0;
+    list-style: none;
+  }
+
+  .choice-item {
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    min-width: 150px;
+    flex: 1 1 150px;
+    text-align: center;
+    position: relative;
+  }
+
+  .voted-choice {
+    background-color: #d1ffd1;
+    border: 2px solid #28a745;
+  }
+
+  .candidate-photo {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+    border-radius: 6px;
+  }
+
+  @media (max-width: 768px) {
+    .election-item {
+      width: 100%;
+    }
+  }
+</style>
+{% endblock %}

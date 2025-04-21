@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>{{ election.title }}</h2>
+<form method="post">
+  {% csrf_token %}
+  <div class="choices-list">
+    {% for choice in election.choices.all %}
+      <div class="choice-item">
+        <label>
+          <input type="radio" name="choice" value="{{ choice.id }}">
+          <strong>{{ choice.text }}</strong>
+        </label><br>
+        {% if choice.photo %}
+          <img src="{{ choice.photo.url }}" alt="{{ choice.text }}" class="candidate-photo">
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+  <button type="submit">Ovoz berish</button>
+  
+</form>
+{% endblock %}
