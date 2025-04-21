@@ -6,7 +6,7 @@ class User(AbstractUser):
     max_length=9,
     unique=True,
     null=True,  
-    verbose_name='Серия паспорта'
+    verbose_name='Passport seriyasi'
 )
 
 
