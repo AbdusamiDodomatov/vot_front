@@ -5,6 +5,11 @@
 <div class="election-container">
   {% for election in elections %}
     <div class="election-item">
+      
+      {% if election.photo %}
+        <img src="{{ election.photo.url }}" alt="{{ election.title }}" class="election-photo">
+      {% endif %}
+      
       <strong>{{ election.title }}</strong>
 
       {% if election.id in voted_ids %}
@@ -54,6 +59,13 @@
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     width: 30%;
+  }
+
+  .election-photo {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+    border-radius: 6px;
   }
 
   .choices-list {

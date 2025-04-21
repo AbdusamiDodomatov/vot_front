@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+
 {% block content %}
 <h2>{{ election.title }}</h2>
 <form method="post">
@@ -7,8 +8,12 @@
     {% for choice in election.choices.all %}
       <div class="choice-item">
         <label>
-          <input type="radio" name="choice" value="{{ choice.id }}">
-          <strong>{{ choice.text }}</strong>
+          <input type="radio" name="choice" value="{{ choice.id }}"
+                 {% if form.choice.value|stringformat:"s" == choice.id|stringformat:"s" %}checked{% endif %}>
+          <strong>
+            {% if form.choice.value|stringformat:"s" == choice.id|stringformat:"s" %}✅ {% endif %}
+            {{ choice.text }}
+          </strong>
         </label><br>
         {% if choice.photo %}
           <img src="{{ choice.photo.url }}" alt="{{ choice.text }}" class="candidate-photo">
@@ -17,6 +22,5 @@
     {% endfor %}
   </div>
   <button type="submit">Ovoz berish</button>
-  
 </form>
 {% endblock %}

@@ -6,6 +6,7 @@ class Election(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     start_date = models.DateTimeField()
+    photo = models.ImageField(upload_to='election_photo/', blank=True, null=True)
     end_date = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
 
