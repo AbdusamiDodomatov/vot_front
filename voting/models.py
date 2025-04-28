@@ -20,6 +20,7 @@ class Election(models.Model):
 class Choice(models.Model):
     election = models.ForeignKey(Election, related_name='choices', on_delete=models.CASCADE)
     text = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
     photo = models.ImageField(upload_to='candidate_photos/', blank=True, null=True)
     votes = models.IntegerField(default=0)
 
