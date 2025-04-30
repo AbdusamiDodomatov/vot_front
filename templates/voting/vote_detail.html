@@ -1,7 +1,19 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 <h2>{{ election.title }}</h2>
+
+{% if election.photo %}
+  <img src="{{ election.photo.url }}" alt="{{ election.title }}" class="election-photo">
+{% else %}
+  <img src="{% static 'images/default-election.png' %}" alt="Default election image" class="election-photo">
+{% endif %}
+
+{% if election.description %}
+  <p class="election-description">{{ election.description }}</p>
+{% endif %}
+
 <form method="post">
   {% csrf_token %}
   <div class="choices-list">
@@ -15,12 +27,76 @@
             {{ choice.text }}
           </strong>
         </label><br>
-        {% if choice.photo %}
-          <img src="{{ choice.photo.url }}" alt="{{ choice.text }}" class="candidate-photo">
+
+        {% if choice.description %}
+          <p class="choice-description">{{ choice.description }}</p>
         {% endif %}
+
+        <img src="{% if choice.photo %}{{ choice.photo.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" 
+             alt="{{ choice.text }}" class="candidate-photo">
       </div>
     {% endfor %}
   </div>
-  <button type="submit">Ovoz berish</button>
+  <button type="submit" class="btn btn-primary mt-3">Ovoz berish</button>
 </form>
+{% endblock %}
+
+{% block styles %}
+<style>
+  .election-photo {
+    width: 100%;
+    max-height: 300px;
+    object-fit: cover;
+    margin-bottom: 15px;
+    border-radius: 6px;
+  }
+
+  .election-description {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 15px;
+  }
+
+  .choices-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 20px;
+  }
+
+  .choice-item {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+    width: 200px;
+    text-align: center;
+  }
+
+  .choice-description {
+    font-size: 13px;
+    color: #666;
+    margin: 10px 0;
+  }
+
+  .candidate-photo {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    object-position: center;
+    margin-top: 10px;
+    border-radius: 6px;
+    background-color: #e0e0e0;
+  }
+
+  @media (max-width: 768px) {
+    .choices-list {
+      flex-direction: column;
+    }
+
+    .choice-item {
+      width: 100%;
+    }
+  }
+</style>
 {% endblock %}
