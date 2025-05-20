@@ -2,53 +2,69 @@
 {% load static %}
 
 {% block content %}
-<h2>{{ election.title }}</h2>
+<div class="election-item">
+  <h2>{{ election.title }}</h2>
 
-{% if election.photo %}
-  <img src="{{ election.photo.url }}" alt="{{ election.title }}" class="election-photo">
-{% else %}
-  <img src="{% static 'images/default-election.png' %}" alt="Default election image" class="election-photo">
-{% endif %}
+  {% if election.photo %}
+    <img src="{{ election.photo.url }}" alt="{{ election.title }}" class="election-photo">
+  {% else %}
+    <img src="{% static 'images/default-election.png' %}" alt="Default election image" class="election-photo">
+  {% endif %}
 
-{% if election.description %}
-  <p class="election-description">{{ election.description }}</p>
-{% endif %}
+  {% if election.description %}
+    <p class="election-description">{{ election.description }}</p>
+  {% endif %}
 
-<form method="post">
-  {% csrf_token %}
-  <div class="choices-list">
-    {% for choice in election.choices.all %}
-      <div class="choice-item">
-        <label>
-          <input type="radio" name="choice" value="{{ choice.id }}"
-                 {% if form.choice.value|stringformat:"s" == choice.id|stringformat:"s" %}checked{% endif %}>
-          <strong>
-            {% if form.choice.value|stringformat:"s" == choice.id|stringformat:"s" %}✅ {% endif %}
-            {{ choice.text }}
-          </strong>
-        </label><br>
+  <form method="post">
+    {% csrf_token %}
+    <div class="choices-list">
+      {% for choice in election.choices.all %}
+        <div class="choice-item">
+          <label>
+            <input type="radio" name="choice" value="{{ choice.id }}"
+                   {% if form.choice.value|stringformat:"s" == choice.id|stringformat:"s" %}checked{% endif %}>
+            <strong>
+              {% if form.choice.value|stringformat:"s" == choice.id|stringformat:"s" %}✅ {% endif %}
+              {{ choice.text }}
+            </strong>
+          </label><br>
 
-        {% if choice.description %}
-          <p class="choice-description">{{ choice.description }}</p>
-        {% endif %}
+          {% if choice.description %}
+            <p class="choice-description">{{ choice.description }}</p>
+          {% endif %}
 
-        <img src="{% if choice.photo %}{{ choice.photo.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" 
-             alt="{{ choice.text }}" class="candidate-photo">
-      </div>
-    {% endfor %}
-  </div>
-  <button type="submit" class="btn btn-primary mt-3">Ovoz berish</button>
-</form>
+          <img src="{% if choice.photo %}{{ choice.photo.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" 
+               alt="{{ choice.text }}" class="candidate-photo">
+        </div>
+      {% endfor %}
+    </div>
+    <button type="submit" class="btn btn-primary mt-3">Ovoz berish</button>
+  </form>
+</div>
 {% endblock %}
+
 
 {% block styles %}
 <style>
+  .election-item {
+    background-color: #fafafa;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
   .election-photo {
     width: 100%;
-    max-height: 300px;
+    height: 100%;
     object-fit: cover;
-    margin-bottom: 15px;
+    object-position: center;
+    margin-bottom: 10px;
     border-radius: 6px;
+    background-color: #e0e0e0;
   }
 
   .election-description {

@@ -4,15 +4,21 @@ from django.contrib import messages
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 
+
 @login_required
 def vote_list(request):
-    elections = Election.objects.filter(start_date__lte=timezone.now(), end_date__gte=timezone.now())
-    user_votes = Vote.objects.filter(user=request.user)
-    voted_ids = [v.election_id for v in user_votes]
+    elections = Election.objects.filter(start_date__lte=timezone.now(), end_date__gte=timezone.now()).prefetch_related('choices')
+    
+    user_votes = Vote.objects.filter(user=request.user).select_related('choice', 'election')
+    voted_ids = [vote.election_id for vote in user_votes]
+    votes_dict = {vote.election_id: vote for vote in user_votes}
+
     return render(request, 'voting/vote_list.html', {
         'elections': elections,
         'voted_ids': voted_ids,
+        'votes_dict': votes_dict,
     })
+
 
 @login_required
 def vote_detail(request, election_id):
@@ -54,3 +60,7 @@ def election_list(request):
         'voted_ids': voted_ids,
         'votes_dict': votes_dict,  
     })
+
+@property
+def total_votes(self):
+    return Vote.objects.filter(choice__election=self).count()
